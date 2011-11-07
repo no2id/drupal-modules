@@ -1,0 +1,16 @@
+#
+# README:
+#
+# Copyright (c) 2011 Adam McGreggor. All rights reserved.
+# Email: <adam@no2id.net>
+#
+# $Id:$
+#
+
+We've been trying to deploy to Drupal for some time now... these are
+the contributed modules to provide:
+
+    -- a signup form that vaguely replicates the old one
+    -- localgroups functionality
+
+

@@ -1,0 +1,159 @@
+<?php
+
+// $Id$
+
+function no2id_registration_perm() {
+}
+
+function no2id_registration_block($op = 'list', $delta = 0, $edit = array()) {
+    switch ($op) {
+        case 'list':
+            $blocks[0]['info'] = t('NO2ID Registration form');
+            $blocks[1]['info'] = t('NO2ID Registration block');
+            return $blocks;
+        case 'view':
+            switch ($delta) {
+                case 0:
+                    $block['subject'] = t('Register');
+                    $block['content'] = drupal_get_form('no2id_registration_form', TRUE);
+                    break;
+                case 1:
+                    $link = l(t('Register your support'), 'register');
+                    $content = t('!register_link to receive a FREE supporter’s pack, regular email newsletter & alerts about NO2ID events in your area.', array('!register_link' => $link));
+                    $block['subject'] = t('Register');
+                    $block['content'] = $content;
+                    break;
+            }
+            return $block;
+    }
+}
+
+function no2id_registration_menu() {
+    $items = array();
+
+    $items['register'] = array(
+    'title' => 'Register',
+    'description' => 'Register your support to receive a FREE supporters pack, regular email newsletter & alerts about NO2ID events in your area.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('no2id_registration_form'),
+    'access callback' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
+    );
+
+    $items['register/done'] = array(
+    'title' => 'Thank you',
+    'page callback' => 'no2id_registration_thanks',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    );
+
+    return $items;
+}
+
+
+function no2id_registration_form($form_id, $wide=false) {
+
+    $field_size = $wide?20:40;
+
+    $form['pretext'] = array(
+    '#prefix' => '<p>',
+    '#value' => t('Register your support to receive a FREE supporter’s pack, regular email newsletter & alerts about NO2ID events in your area.'),
+    '#suffix' => "</p>\n",
+    );
+
+    $form['forename'] = array(
+    '#title' => t('Forename'),
+    '#type' => 'textfield',
+    '#size' => $field_size,
+    );
+
+    $form['lastname'] = array(
+    '#title' => t('Lastname'),
+    '#type' => 'textfield',
+    '#size' => $field_size,
+    );
+
+    $form['address1'] = array(
+    '#title' => t('Number, road'),
+    '#type' => 'textfield',
+    '#size' => $field_size,
+    );
+
+    $form['town'] = array(
+    '#title' => t('Town'),
+    '#type' => 'textfield',
+    '#size' => $field_size,
+    );
+
+    $form['postcode'] = array(
+    '#title' => t('Postcode'),
+    '#type' => 'textfield',
+    '#size' => $field_size,
+    );
+
+    $form['email'] = array(
+    '#title' => t('Email'),
+    '#type' => 'textfield',
+    '#size' => $field_size,
+    );
+
+    $form['magicword'] = array(
+    '#prefix' => '<p>',
+    '#value' => t('And to help prevent spam, please enter the “Magic Word”, which is:'),
+    '#suffix' => "</p>\n",
+    );
+
+    $form['magicword2'] = array(
+    '#prefix' => '<p style="font-weight: bold; color: red">',
+    '#value' => t('riddle'),
+    '#suffix' => "</p>\n",
+    );
+
+    $form['magic'] = array(
+    '#title' => t('Magic word'),
+    '#type' => 'textfield',
+    '#size' => $field_size,
+    );
+
+    $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Click to register'),
+    );
+
+    $form['nosharing'] = array(
+    '#prefix' => '<p>',
+    '#value' => t('We will not share your details with anyone else, nor publish your name without your permission.'),
+    '#suffix' => "</p>\n",
+    );
+
+    return $form;
+}
+
+
+function no2id_registration_form_validate($form, &$form_state) {
+    $data = $form_state['values'];
+    if (trim($data['forename'])=='') {
+        form_set_error('forename', 'Please enter your first name.');
+    }
+    if (trim($data['lastname'])=='') {
+        form_set_error('lastname', 'Please enter your last name.');
+    }
+    if (trim($data['address1'])=='') {
+        form_set_error('address1', 'Please enter your house name, or number, and road name.');
+    }
+    if (!valid_email_address($data['email'])) {
+        form_set_error('email', t('Please enter a valid email address.'));
+    }
+    if (trim($data['magic'])!=t('riddle')) {
+        form_set_error('magic', t('Please enter the correct magic word.'));
+    }
+}
+
+function no2id_registration_form_submit($form, &$form_state) {
+    drupal_set_message('Form data:<br \>'. print_r($form_state['values'], true));
+    $form_state['redirect'] = 'register/done';
+}
+
+function no2id_registration_thanks() {
+    return "<p>Thanks!</p>\n";
+}

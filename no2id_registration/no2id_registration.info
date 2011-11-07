@@ -1,0 +1,4 @@
+name = NO2ID Registration
+description = Registration functionality for NO2ID
+core = 6.x
+package = NO2ID

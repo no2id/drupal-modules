@@ -1,0 +1,5 @@
+; $Id: no2id_localgroups.info 32 2009-12-21 19:34:29Z adam $
+name = NO2ID Local Groups Module
+description = pull useful info for public display from our local groups database table 
+core = 6.x
+package = NO2ID

@@ -1,0 +1,83 @@
+<?php
+/*
+ * no2id_localgroups.module:
+ *     drupal module for no2id's localgroups
+ *
+ * Copyright (c) 2009 No2ID. All rights reserved.
+ * Email: <adam@amyl.org.uk> Web: <http://blog.amyl.org.uk>
+ *
+ * $Id: no2id_localgroups.module 58 2010-04-13 16:59:57Z harry $
+ *
+ */
+
+function no2id_localgroups_perm() {
+    return array(
+    'access NO2ID localgroups content',
+    );
+}
+
+function no2id_localgroups_menu() {
+    $items = array();
+
+    $items['localgroups'] = array(
+    'title' => 'Local Groups',
+    'page callback' => 'no2id_localgroups_page',
+    'access arguments' => array('access NO2ID localgroups content'),
+    'type' => MENU_NORMAL_ITEM,
+    );
+
+    return $items;
+}
+
+
+function no2id_localgroups_page() {
+
+    $regions = array(
+    'Scotland',
+    'Northern Ireland',
+    'North West',
+    'North East',
+    'Yorkshire and the Humber',
+    'Wales',
+    'West Midlands',
+    'East Midlands',
+    'East of England',
+    'South West',
+    'London',
+    'South East',
+    'International'
+    );
+    $html = '';
+    foreach($regions as $region) {
+        $sql = "SELECT * FROM no2id.localgroups WHERE region = '%s' AND no_web = 0 ORDER BY name";
+        $result = db_query($sql,$region);
+        $group_list_html = '';
+        while ($row = db_fetch_array($result)) {
+            $group_list_html .= theme('no2id_localgroup',$row);
+        }
+        $html .= theme('no2id_localgroup_region',$region, strtolower(preg_replace("/\W+/", '_', $region)), $group_list_html);
+    }
+    return theme('no2id_localgroup_page',$html);
+}
+
+function no2id_localgroups_theme()
+{
+    $theme_hooks = array();
+    $theme_hooks['no2id_localgroup'] = array('template'=>'templates/localgroup', 'arguments' => array('data' => NULL));
+    $theme_hooks['no2id_localgroup_region'] = array('template'=>'templates/localgroup_region', 'arguments' => array('region' => NULL, 'region_name' => NULL, 'group_list_html' => NULL));
+    $theme_hooks['no2id_localgroup_page'] = array('template'=>'templates/localgroup_page', 'arguments' => array('region_list_html' => NULL));
+    return $theme_hooks;
+}
+
+function template_preprocess_no2id_localgroup(&$variables)
+{
+    $variables['group'] = check_plain($variables['data']['name']);
+    $variables['group_name'] = check_plain(strtolower(preg_replace('/\W+/', '_', $variables['data']['name'])));
+    $variables['contact_name'] = check_plain($variables['data']['contact_name']);
+    $variables['contact_email'] = '<a href="mailto:'.check_plain($variables['data']['contact_email']).'">'.check_plain($variables['data']['contact_email']).'</a>';
+    $variables['grouplist_uri'] = $variables['data']['grouplist_uri'];
+    $variables['website'] = $variables['data']['website'];
+    $variables['contact_tel'] = check_plain($variables['data']['contact_tel']);
+    //$variables['has_mailing_list'] = $variables['data']['grouplist_uri'];
+
+}
